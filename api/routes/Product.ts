@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import express = require('express');
+import { Product } from '../models/Product';
 
 export default class ProductRoutes {
   /**
@@ -7,8 +8,15 @@ export default class ProductRoutes {
    * @param app Objeto app do express
    */
   public static routes(app: express.Application /* ,verifyJWT */): void {
-    app.get('/test', async (req: Request, res: Response) => {
-      res.status(200).send('Works!!!');
+    app.get('/products', async (req: Request, res: Response) => {
+      const products = await Product.findAll();
+      res.status(200).send(products);
     });
+
+    // POST
+
+    // PUT
+
+    // DELETE
   }
 }

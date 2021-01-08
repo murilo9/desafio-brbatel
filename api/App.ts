@@ -1,25 +1,31 @@
-/* eslint-disable import/first */
-// import * as mongoose from 'mongoose';
+import { Sequelize } from 'sequelize-typescript';
 import cors = require('cors');
 import express = require('express');
 import bodyParser = require('body-parser');
 import ProductRoutes from './routes/Product';
 
-// const mongodbString = process.env.MONGODB_URI || 'mongodb://localhost/mydria';
-
 export class App {
   public app: express.Application;
-  // Declara todos os grupos de rotas:
-  // public userRoutes: UserRoutes = new UserRoutes();
 
   constructor() {
     this.app = express();
-    this.app.use(express.static('dist/pictures')); // Necessário para servir o pictures folder
+    // Necessário para servir o diretório pictures
+    this.app.use(express.static('dist/pictures'));
+    // Necessário para servir o diretório tmp
+    this.app.use(express.static('dist/tmp'));
+    // Configura o App do express
     this.config();
     // Carrega todos os grupos de rotas:
     ProductRoutes.routes(this.app /* , verifyJWT */);
-    // inicializa o banco de dados:
-    // mongoose.connect(mongodbString, {useNewUrlParser: true});
+    // Inicializa o banco de dados:
+    const sequelize = new Sequelize({
+      database: 'brbatel',
+      dialect: 'postgres',
+      username: 'murilo',
+      password: '000000',
+      models: [`${__dirname}/models`], // or [Player, Team],
+    });
+    sequelize.sync({ force: true });
   }
 
   private config(): void {

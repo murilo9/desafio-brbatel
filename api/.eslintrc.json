@@ -15,5 +15,10 @@
         "@typescript-eslint"
     ],
     "rules": {
+        "import/first": "off",
+        "import/no-unresolved": "off",
+        "import/extensions": "off",
+        "no-path-concat": "off",
+        "import/prefer-default-export": "off"
     }
 }

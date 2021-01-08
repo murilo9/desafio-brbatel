@@ -6,7 +6,9 @@
     "sourceMap": true,
     "target": "es6",
     "outDir": "./dist",
-    "noUnusedLocals": false
+    "noUnusedLocals": false,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
   },
   "exclude": [
     "node_modules"
