@@ -25,6 +25,7 @@ export class App {
       password: '000000',
       models: [`${__dirname}/models`], // or [Player, Team],
     });
+    // Atualiza o banco de dados (cria as tabelas que não existirem)
     sequelize.sync({ force: true });
   }
 
