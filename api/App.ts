@@ -2,6 +2,7 @@ import { Sequelize } from 'sequelize-typescript';
 import cors = require('cors');
 import express = require('express');
 import bodyParser = require('body-parser');
+import verifyJWT from './middleware/Auth';
 import ProductRoutes from './routes/Product';
 
 export class App {
@@ -16,7 +17,7 @@ export class App {
     // Configura o App do express
     this.config();
     // Carrega todos os grupos de rotas:
-    ProductRoutes.routes(this.app /* , verifyJWT */);
+    ProductRoutes.routes(this.app, verifyJWT);
     // Inicializa o banco de dados:
     const sequelize = new Sequelize({
       database: 'brbatel',
