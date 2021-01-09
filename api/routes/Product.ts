@@ -13,10 +13,35 @@ export default class ProductRoutes {
       res.status(200).send(products);
     });
 
-    // POST
+    app.post('/products', async (req: Request, res: Response) => {
+      const product = await Product.create(req.body);
+      res.status(201).send(product);
+    });
 
-    // PUT
+    app.put('/product/:productId', async (req: Request, res: Response) => {
+      const produtcId = req.params.productId;
+      const product = await Product.findByPk(produtcId);
+      if (product) {
+        for (const key in req.body) {
+          console.log(`updating key: ${key}`);
+          product[key] = req.body[key];
+        }
+        await product.save();
+        res.status(200).send(product);
+      } else {
+        res.status(404).send('Produto não existente.');
+      }
+    });
 
-    // DELETE
+    app.delete('/product/:productId', async (req: Request, res: Response) => {
+      const produtcId = req.params.productId;
+      const product = await Product.findByPk(produtcId);
+      if (product) {
+        await product.destroy();
+        res.status(200).send('Produto excluído com sucesso.');
+      } else {
+        res.status(404).send('Produto não existente.');
+      }
+    });
   }
 }
