@@ -1,5 +1,5 @@
 import {
-  Table, Column, Model, CreatedAt, UpdatedAt,
+  Table, Column, Model, CreatedAt, UpdatedAt, DeletedAt,
 } from 'sequelize-typescript';
 
 @Table
@@ -24,4 +24,7 @@ export class Product extends Model<Product> {
 
   @UpdatedAt
   updated: Date
+
+  @DeletedAt
+  deleted: Date
 }
