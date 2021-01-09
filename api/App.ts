@@ -3,7 +3,9 @@ import cors = require('cors');
 import express = require('express');
 import bodyParser = require('body-parser');
 import verifyJWT from './middleware/Auth';
+// Import das rotas
 import ProductRoutes from './routes/Product';
+import LoginRoutes from './routes/Login';
 
 export class App {
   public app: express.Application;
@@ -18,6 +20,7 @@ export class App {
     this.config();
     // Carrega todos os grupos de rotas:
     ProductRoutes.routes(this.app, verifyJWT);
+    LoginRoutes.routes(this.app);
     // Inicializa o banco de dados:
     const sequelize = new Sequelize({
       database: 'brbatel',

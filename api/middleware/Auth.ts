@@ -14,11 +14,11 @@ export default (req, res, next) => {
     if (err) {
       return res.status(401).send({
         auth: false,
-        message: 'Failed to authenticate token.',
+        message: 'Falha na autenticação do token.',
       });
     }
     // Se tudo estiver ok, salva no request para uso posterior:
-    req.requesterId = decoded.id;
+    req.user = decoded.user;
     next();
   });
 };
