@@ -1,19 +1,21 @@
 import React, { Component } from 'react'
-import axios from 'axios'
+import DashboardState from '../types/DashboardState'
 import Cookies from 'js-cookie'
-import { Redirect } from 'react-router-dom';
-
-type DashboardState = {
-  session: {
-    token: string,
-    user: string
-  }
-}
+import { Redirect } from 'react-router-dom'
+import {getProducts} from '../services/Product'
+import { AppBar, Button, Container, Toolbar, Typography } from '@material-ui/core'
+import MenuIcon from '@material-ui/icons/Menu'
+import AddIcon from '@material-ui/icons/Add'
+import ProductsTable from '../components/ProductsTable'
 
 export default class Dashboard extends Component<{}, DashboardState> {
   constructor(props: {} | Readonly<{}>){
     super(props);
     this.state = {
+      products: [],
+      fetching: {
+        loadingProducts: true
+      },
       session: {
         token: '',
         user: ''
@@ -22,9 +24,9 @@ export default class Dashboard extends Component<{}, DashboardState> {
   }
 
   componentWillMount(){
-    const expireDate = new Date(Cookies.get('expire') as string)
+    const expireDateMilis = parseInt(Cookies.get('expire') as string)
     // Se a sessão tiver expirado, faz logout
-    if(expireDate.getTime() <= new Date().getTime()){
+    if(expireDateMilis <= new Date().getTime()){
       this.logout()
     } 
     // Se a sessão estiver ativa, guarda os dados dela no state
@@ -36,81 +38,27 @@ export default class Dashboard extends Component<{}, DashboardState> {
         }
       })
     }
+    this.loadProducts()
   }
 
-  get(){
-    axios({
-      method: 'get',
-      url: 'http://127.0.0.1:8888/products',
-      headers: {
-        'x-access-token': this.state.session.token
-      }
-    })
-    .then((res) => {
-      console.log(res)
-    })
-    .catch(e => console.log(e))
-  }
-  
-  post(){
-    axios({
-      method: 'post',
-      url: 'http://127.0.0.1:8888/products',
-      headers: {
-        'x-access-token': this.state.session.token
-      },
-      data: {
-        name: 'Arduino Uno',
-        currentStock: 10,
-        minStock: 4,
-        cost: 35,
-        price: 48
-      }
-    })
-    .then((res) => {
-      console.log(res)
-    })
-    .catch(e => console.log(e))
-  }
-  
-  put(){
-    axios({
-      method: 'put',
-      url: 'http://127.0.0.1:8888/product/1',
-      headers: {
-        'x-access-token': this.state.session.token
-      },
-      data: {
-        name: 'Arduino Uno',
-        currentStock: 15,
-        minStock: 4,
-        cost: 35,
-        price: 45
-      }
-    })
-    .then((res) => {
-      console.log(res)
-    })
-    .catch(e => console.log(e))
-  }
-  
-  remove(){
-    axios({
-      method: 'delete',
-      url: 'http://127.0.0.1:8888/product/1',
-      headers: {
-        'x-access-token': this.state.session.token
-      }
-    })
-    .then((res) => {
-      console.log(res)
-    })
-    .catch(e => console.log(e))
+  async loadProducts(){
+    const products = await getProducts()
+    if(products.success){
+      this.setState({
+        products: products.data,
+        fetching: {
+          loadingProducts: false
+        }
+      })
+    } else {
+      //TODO: tratamento de erro ao carregar produtos
+    }
   }
 
   logout(){
-    Cookies.remove('token');
-    Cookies.remove('user');
+    Cookies.remove('token')
+    Cookies.remove('user')
+    Cookies.remove('expire')
     this.setState({
       session: {
         token: '',
@@ -119,15 +67,33 @@ export default class Dashboard extends Component<{}, DashboardState> {
     })
   }
 
+  renderTable(){
+    
+  }
+
   render(){
     if(this.state.session.token)
       return (
         <div className="App">
-          <button type="button" onClick={this.logout.bind(this)}>logout</button>
-          <button type="button" onClick={this.get.bind(this)}>get</button>
-          <button type="button" onClick={this.post.bind(this)}>post</button>
-          <button type="button" onClick={this.put.bind(this)}>put</button>
-          <button type="button" onClick={this.remove.bind(this)}>remove</button>
+          <AppBar position="static">
+            <Toolbar>
+            { /* padding */}
+              <MenuIcon />
+              <Typography variant="h6">
+                News
+              </Typography>
+              { /* flex-grow: 1 */}
+              <Button color="inherit" onClick={this.logout.bind(this)}>Logout</Button>
+            </Toolbar>
+          </AppBar>
+          <main>
+            <Container maxWidth="lg">
+              <Button color="primary" variant="contained">
+                <AddIcon /> Adicionar
+              </Button>
+              <ProductsTable {...this.state} />
+            </Container>
+          </main>
         </div>
       );
     else

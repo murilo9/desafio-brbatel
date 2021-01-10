@@ -2,33 +2,11 @@ import React, { Component } from 'react'
 import axios from 'axios'
 import Cookies from 'js-cookie'
 import { Redirect } from 'react-router-dom'
+import LoginResponse from '../types/LoginResponse'
+import LoginState from '../types/LoginState'
+import LoginForm from '../types/LoginForm'
 import Button from '@material-ui/core/Button';
 import { Container, Grid, Snackbar, TextField, Typography } from '@material-ui/core';
-
-type LoginState = {
-  snackbar: {
-    show: boolean,
-    message: string
-  },
-  session: {
-    token: string,
-    user: string
-  }
-}
-
-type LoginResponse = {
-  data: {
-    auth: boolean,
-    token: string,
-    user: string,
-    msg: string
-  }
-}
-
-type LoginForm = {
-  username: string,
-  password: string
-}
 
 export default class Login extends Component<{}, LoginState> {
 
