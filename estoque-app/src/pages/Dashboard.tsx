@@ -2,11 +2,12 @@ import React, { Component } from 'react'
 import DashboardState from '../types/DashboardState'
 import Cookies from 'js-cookie'
 import { Redirect } from 'react-router-dom'
-import {getProducts} from '../services/Product'
+import {getProducts, createProduct} from '../services/Product'
 import { AppBar, Button, Container, Toolbar, Typography } from '@material-ui/core'
 import MenuIcon from '@material-ui/icons/Menu'
-import AddIcon from '@material-ui/icons/Add'
 import ProductsTable from '../components/ProductsTable'
+import ProductForm from '../components/ProductForm'
+import ProductItem from '../types/ProductItem'
 
 export default class Dashboard extends Component<{}, DashboardState> {
   constructor(props: {} | Readonly<{}>){
@@ -55,6 +56,22 @@ export default class Dashboard extends Component<{}, DashboardState> {
     }
   }
 
+  async createProduct(productData: ProductItem){
+    const createRequest = await createProduct(productData)
+    if(createRequest.success){
+      const brandNewProduct = createRequest.data
+      let products = this.state.products
+      products.push(brandNewProduct)
+      this.setState({
+        products
+      })
+    }
+  }
+
+  async updateProduct(productData: ProductItem){
+
+  }
+
   logout(){
     Cookies.remove('token')
     Cookies.remove('user')
@@ -91,9 +108,11 @@ export default class Dashboard extends Component<{}, DashboardState> {
               <Typography variant="h4">
                 Produtos
               </Typography>
-              <Button color="primary" variant="contained">
-                <AddIcon /> Adicionar
-              </Button>
+              {/* TODO: colocar o form dentro de um modal */}
+              <ProductForm productData={null as unknown as ProductItem} 
+                create={this.createProduct.bind(this)}
+                update={() => {}}
+              />
               <ProductsTable {...this.state} />
             </Container>
           </main>

@@ -34,6 +34,7 @@ export async function getProducts(): Promise<Response>{
 
 export async function createProduct(data: any): Promise<Response>{
   try{
+    console.log(token)
     const res = await axios({
       method: 'post',
       url: 'http://127.0.0.1:8888/products',

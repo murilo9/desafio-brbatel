@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import DashboardState from '../types/DashboardState'
+import ProductItem from './ProductItem'
 import Table from '@material-ui/core/Table'
 import TableBody from '@material-ui/core/TableBody'
 import TableCell from '@material-ui/core/TableCell'
@@ -28,15 +29,18 @@ export default class ProductsTable extends Component<DashboardState, {}>{
         <Table aria-label="simple table">
           <TableHead>
             <TableRow>
-              <TableCell>Dessert (100g serving)</TableCell>
-              <TableCell align="right">Calories</TableCell>
-              <TableCell align="right">Fat&nbsp;(g)</TableCell>
-              <TableCell align="right">Carbs&nbsp;(g)</TableCell>
-              <TableCell align="right">Protein&nbsp;(g)</TableCell>
+              <TableCell>ID</TableCell>
+              <TableCell align="center">Nome</TableCell>
+              <TableCell align="center">Estoque Atual</TableCell>
+              <TableCell align="center">Estoque Mín.</TableCell>
+              <TableCell align="center">Custo</TableCell>
+              <TableCell align="center">Preço</TableCell>
+              <TableCell align="center"></TableCell>
+              <TableCell align="center"></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            
+            { this.props.products.map(product => <ProductItem {...product} />)}
           </TableBody>
         </Table>
       </TableContainer>
