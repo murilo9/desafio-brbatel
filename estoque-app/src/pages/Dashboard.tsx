@@ -80,7 +80,7 @@ export default class Dashboard extends Component<{}, DashboardState> {
             { /* padding */}
               <MenuIcon />
               <Typography variant="h6">
-                News
+                Controle de Estoque
               </Typography>
               { /* flex-grow: 1 */}
               <Button color="inherit" onClick={this.logout.bind(this)}>Logout</Button>
@@ -88,6 +88,9 @@ export default class Dashboard extends Component<{}, DashboardState> {
           </AppBar>
           <main>
             <Container maxWidth="lg">
+              <Typography variant="h4">
+                Produtos
+              </Typography>
               <Button color="primary" variant="contained">
                 <AddIcon /> Adicionar
               </Button>
