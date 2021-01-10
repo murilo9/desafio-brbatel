@@ -47,7 +47,6 @@ export default class Login extends Component<{}, LoginState> {
   }
 
   componentWillMount(){
-    console.log('componentWillMount')
     const expireDateMilis = parseInt(Cookies.get('expire') as string)
     // Se houver a data de expiração da sessão slava nos cookies
     if(expireDateMilis){
@@ -91,7 +90,7 @@ export default class Login extends Component<{}, LoginState> {
         Cookies.set('token', token);
         Cookies.set('user', user);
         let expireDate = new Date();
-        expireDate.setUTCHours(expireDate.getHours()+1);
+        expireDate.setHours(expireDate.getHours()+1);
         Cookies.set('expire', expireDate.getTime() as unknown as string);
         this.setState({
           session: {
