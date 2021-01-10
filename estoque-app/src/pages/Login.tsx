@@ -2,8 +2,14 @@ import React, { Component } from 'react'
 import axios from 'axios'
 import Cookies from 'js-cookie'
 import { Redirect } from 'react-router-dom'
+import Button from '@material-ui/core/Button';
+import { Container, Grid, Snackbar, TextField, Typography } from '@material-ui/core';
 
 type LoginState = {
+  snackbar: {
+    show: boolean,
+    message: string
+  },
   session: {
     token: string,
     user: string
@@ -29,6 +35,10 @@ export default class Login extends Component<{}, LoginState> {
   constructor(props: {} | Readonly<{}>){
     super(props);
     this.state = {
+      snackbar: {
+        message: '',
+        show: false
+      },
       session: {
         token: '',
         user: ''
@@ -36,13 +46,13 @@ export default class Login extends Component<{}, LoginState> {
     }
   }
 
-  componentDidMount(){
-    const expireDateMilis = Cookies.get('expire')
+  componentWillMount(){
+    console.log('componentWillMount')
+    const expireDateMilis = parseInt(Cookies.get('expire') as string)
     // Se houver a data de expiração da sessão slava nos cookies
     if(expireDateMilis){
-      const expireDate = new Date(expireDateMilis as string)
       // Se a sessão não tiver expirado
-      if(expireDate.getTime() >= new Date().getTime()){
+      if(expireDateMilis >= new Date().getTime()){
         // Salva os dados da sessão no state
         this.setState({
           session: {
@@ -57,13 +67,15 @@ export default class Login extends Component<{}, LoginState> {
   getLoginForm(): LoginForm {
     const loginInput = document.getElementById('input-username') as HTMLInputElement;
     const passwordInput = document.getElementById('input-password') as HTMLInputElement;
+    console.log(loginInput)
     return {
       username: loginInput ? loginInput.value : '',
       password: passwordInput ? passwordInput.value : ''
     }
   }
 
-  login(){
+  login(event: React.FormEvent<HTMLFormElement>){
+    event.preventDefault()
     const { username, password } = this.getLoginForm();
     axios({
       method: 'post',
@@ -89,7 +101,23 @@ export default class Login extends Component<{}, LoginState> {
         })
       }
     })
-    .catch(e => console.log(e))
+    .catch(e => {
+      this.setState({
+        snackbar: {
+          message: e.response.data,
+          show: true
+        }
+      })
+    })
+  }
+
+  handleClose(){
+    this.setState({
+      snackbar: {
+        message: '',
+        show: false
+      }
+    })
   }
 
   render(){
@@ -97,12 +125,40 @@ export default class Login extends Component<{}, LoginState> {
       return <Redirect to="/dashboard" />
     else 
       return (
-        <form>
-          token: { this.state.session.token }
-          <input type="text" id="input-username" />
-          <input type="text" id="input-password" />
-          <button type="button" onClick={this.login.bind(this)}>Login</button>
-        </form>
+        <Container maxWidth="xs">
+          <Typography component="h1" variant="h4">Controle de Estoque</Typography>
+          <form noValidate onSubmit={this.login.bind(this)}>
+            <Grid container>
+              <Grid item xs={12}>
+                <TextField id="input-username" 
+                label="Login" 
+                fullWidth
+                variant="outlined" 
+                margin="normal"/>
+              </Grid>
+              <Grid item xs={12}>
+                <TextField id="input-password" 
+                label="Senha" 
+                fullWidth
+                variant="outlined" 
+                type="password" 
+                margin="normal"/>
+              </Grid>
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                color="primary"
+              >
+                Login
+              </Button>
+            </Grid>
+          </form>
+          <Snackbar open={this.state.snackbar.show} 
+          autoHideDuration={6000} 
+          onClose={this.handleClose.bind(this)}
+          message={this.state.snackbar.message}/>
+        </Container>
       )
   }
 }
