@@ -16,6 +16,10 @@ export default class Dashboard extends Component<ProductItemProps, {}> {
     return this.props.productData.currentStock < this.props.productData.minStock ? 'stock-low' : ''
   }
 
+  onUpdate(){
+    this.props.update(this.props.productData)
+  }
+
   onDelete(){
     this.props.delete(this.props.productData.id)
   }
@@ -35,7 +39,7 @@ export default class Dashboard extends Component<ProductItemProps, {}> {
         <TableCell align="center">{ this.renderPrice(this.props.productData.cost) }</TableCell>
         <TableCell align="center">{ this.renderPrice(this.props.productData.price) }</TableCell>
         <TableCell align="center">
-          <IconButton aria-label="delete">
+          <IconButton aria-label="delete" onClick={this.onUpdate.bind(this)}>
             <EditIcon />
           </IconButton>
         </TableCell>

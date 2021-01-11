@@ -2,9 +2,10 @@ import React, { Component } from 'react'
 import DashboardState from '../types/DashboardState'
 import Cookies from 'js-cookie'
 import { Redirect } from 'react-router-dom'
-import {getProducts, createProduct, removeProduct} from '../services/Product'
+import {getProducts, createProduct, removeProduct, updateProduct} from '../services/Product'
 import { AppBar, Button, Container, Toolbar, Typography, Paper, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Snackbar } from '@material-ui/core'
 import MenuIcon from '@material-ui/icons/Menu'
+import AddIcon from '@material-ui/icons/Add'
 import Table from '@material-ui/core/Table'
 import TableBody from '@material-ui/core/TableBody'
 import TableCell from '@material-ui/core/TableCell'
@@ -21,6 +22,8 @@ export default class Dashboard extends Component<{}, DashboardState> {
     this.state = {
       products: [], // Lista de produtos
       productToDelete: -1,  // ID do produto a ser deletado
+      productToUpdate: undefined,  // Dados do produto a ser atualizado
+      showProductForm: false,
       fetching: {   // Indicadores de fetching server
         loadingProducts: true,
         deletingProduct: false
@@ -78,13 +81,50 @@ export default class Dashboard extends Component<{}, DashboardState> {
       let products = this.state.products
       products.push(brandNewProduct)
       this.setState({
-        products
+        products,
+        showProductForm: false,
+        snackbar: {
+          show: true,
+          message: 'Produto cadastrado com sucesso.'
+        }
       })
     }
   }
 
-  async doUpdateProduct(){
-
+  async doUpdateProduct(productData: ProductAttributes){
+    // Fecha o form de produto
+    this.setState({
+      showProductForm: false,
+    })
+    // Faz o fetch no server
+    const productId = this.state.productToUpdate?.id as number
+    const updateReq = await updateProduct(productId, productData)
+    // Caso o produto tenha sido atualizado com sucesso
+    if(updateReq.success){
+      // Atualiza a lista de produtos
+      let products = this.state.products
+      let updatedProductId = this.state.productToUpdate?.id as number
+      let productIndex = products.findIndex(product => product.id === updatedProductId)
+      if(productIndex >= 0){
+        products.splice(productIndex, 1, updateReq.data)
+      }
+      this.setState({
+        products,
+        snackbar: {
+          show: true,
+          message: 'Produto atualizado com sucesso.'
+        }
+      })
+    }
+    // Caso haja falha na atualização
+    else {
+      this.setState({
+        snackbar: {
+          show: true,
+          message: updateReq.msg
+        }
+      })
+    }
   }
 
   /**
@@ -157,8 +197,11 @@ export default class Dashboard extends Component<{}, DashboardState> {
     })
   }
 
-  openUpdateForm(productId: number){
-
+  openUpdateProductForm(productToUpdate: ProductAttributes){
+    this.setState({
+      productToUpdate,
+      showProductForm: true
+    })
   }
 
   hideSnackbar(){
@@ -182,7 +225,7 @@ export default class Dashboard extends Component<{}, DashboardState> {
     })
   }
 
-  productsTable(){
+  renderProductsTable(){
     if(this.state.fetching.loadingProducts){
       return <Typography variant="subtitle1" gutterBottom>
         Carregando produtos...
@@ -214,11 +257,36 @@ export default class Dashboard extends Component<{}, DashboardState> {
                 <ProductItem productData={{...product}} 
                 key={product.id}
                 delete={this.openDeleteDialog.bind(this)} 
-                update={this.openUpdateForm.bind(this)}/>)
+                update={this.openUpdateProductForm.bind(this)}/>)
             }
           </TableBody>
         </Table>
       </TableContainer>
+    )
+  }
+
+  toggleProductForm(){
+    this.setState({
+      showProductForm: !this.state.showProductForm,
+      productToUpdate: undefined
+    })
+  }
+
+  renderProductForm(){
+    if(this.state.showProductForm)
+      return (
+        <ProductForm 
+          productData={this.state.productToUpdate} 
+          create={this.onCreateProduct.bind(this)}
+          update={this.doUpdateProduct.bind(this)}
+          close={this.toggleProductForm.bind(this)}
+        />
+      )
+    else return (
+      <Button color="primary" variant="contained" 
+      onClick={this.toggleProductForm.bind(this)}>
+        <AddIcon /> Adicionar
+      </Button>
     )
   }
 
@@ -246,11 +314,8 @@ export default class Dashboard extends Component<{}, DashboardState> {
               <Typography variant="h4">
                 Produtos
               </Typography>
-              <ProductForm productData={null as unknown as ProductAttributes} 
-                create={this.onCreateProduct.bind(this)}
-                update={this.doUpdateProduct.bind(this)}
-              />
-            { this.productsTable() }
+            { this.renderProductForm() }
+            { this.renderProductsTable() }
             </Container>
           </main>
 

@@ -1,8 +1,6 @@
 import axios from 'axios'
 import Cookies from 'js-cookie'
 
-const token = Cookies.get('token')
-
 type Response = {
   success: boolean,
   data: any,
@@ -10,6 +8,7 @@ type Response = {
 }
 
 export async function getProducts(): Promise<Response>{
+  const token = Cookies.get('token')
   try{
     const res = await axios({
       method: 'get',
@@ -33,6 +32,7 @@ export async function getProducts(): Promise<Response>{
 }
 
 export async function createProduct(data: any): Promise<Response>{
+  const token = Cookies.get('token')
   try{
     console.log(token)
     const res = await axios({
@@ -57,7 +57,8 @@ export async function createProduct(data: any): Promise<Response>{
   }
 }
 
-export async function updateProduct(productId: string, data: any): Promise<Response>{
+export async function updateProduct(productId: number, data: any): Promise<Response>{
+  const token = Cookies.get('token')
   try{
     const res = await axios({
       method: 'put',
@@ -82,6 +83,7 @@ export async function updateProduct(productId: string, data: any): Promise<Respo
 }
 
 export async function removeProduct(productId: number): Promise<Response>{
+  const token = Cookies.get('token')
   try{
     const res = await axios({
       method: 'delete',

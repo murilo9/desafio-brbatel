@@ -3,6 +3,8 @@ import ProductAttributes from './ProductAttributes'
 type DashboardState = {
   products: Array<ProductAttributes>,
   productToDelete: number,
+  productToUpdate?: ProductAttributes,
+  showProductForm: boolean,
   fetching: {
     loadingProducts: boolean,
     deletingProduct: boolean

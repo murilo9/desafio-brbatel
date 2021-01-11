@@ -1,30 +1,12 @@
 import { Button, TextField } from '@material-ui/core'
 import React, { Component } from 'react'
-import ProductFormState from '../types/ProductFormState'
 import ProductFormProps from '../types/ProductFormProps'
-import AddIcon from '@material-ui/icons/Add'
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 
-export default class ProductForm extends Component<ProductFormProps, ProductFormState> {
-  constructor(props: ProductFormProps){
-    super(props)
-    this.state = {
-      // Se houver um objeto em productData, deve obrigatoriamente exibir o form
-      showForm: props.productData ? true : false,
-      // Só entra no editMode se houver um objeto em props.productData
-      editMode: props.productData ? true : false
-    }
-  }
-
-  toggleForm(){
-    this.setState({
-      showForm: !this.state.showForm
-    })
-  }
+export default class ProductForm extends Component<ProductFormProps, {}> {
 
   handleFormAction(){
     const nameInput = document.getElementById('input-name') as HTMLInputElement
@@ -34,10 +16,10 @@ export default class ProductForm extends Component<ProductFormProps, ProductForm
     const priceInput = document.getElementById('input-price') as HTMLInputElement
     const productData = {
       name: nameInput ? nameInput.value : null,
-      currentStock: currentStockInput ? currentStockInput.value : null,
-      minStock: minStockInput ? minStockInput.value : null,
-      cost: costInput ? costInput.value : null,
-      price: priceInput ? priceInput.value : null
+      currentStock: currentStockInput ? parseInt(currentStockInput.value) : null,
+      minStock: minStockInput ? parseInt(minStockInput.value) : null,
+      cost: costInput ? parseFloat(costInput.value) : null,
+      price: priceInput ? parseFloat(priceInput.value) : null
     }
     // Se estiver atualziando um produto
     if(this.props.productData){
@@ -47,40 +29,58 @@ export default class ProductForm extends Component<ProductFormProps, ProductForm
     else {
       this.props.create(productData)
     }
-    this.setState({
-      showForm: false
-    })
+  }
+
+  onClose(){
+    this.props.close()
+  }
+
+  initialValue(field: string){
+    if(this.props.productData){
+      switch(field){
+        case 'name':
+          return this.props.productData.name
+        case 'currentStock':
+          return this.props.productData.currentStock
+        case 'minStock':
+          return this.props.productData.minStock
+        case 'price':
+          return this.props.productData.price
+        case 'cost':
+          return this.props.productData.cost
+        default:
+          return ''
+      }
+    }
+    else return ''
   }
 
   render(){
-    if(this.state.showForm)
-      return (
-        <Dialog open={this.state.showForm} 
-        onClose={this.toggleForm.bind(this)} aria-labelledby="form-dialog-title">
-          <DialogTitle id="form-dialog-title">Subscribe</DialogTitle>
-          <DialogContent>
-            <TextField id="input-name" label="Nome" fullWidth/>
-              <TextField id="input-current-stock" label="Estoque atual" fullWidth/>
-              <TextField id="input-min-stock" label="Estoque mín." fullWidth/>
-              <TextField id="input-cost" label="Custo" fullWidth/>
-              <TextField id="input-price" label="Preço" fullWidth/>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={this.toggleForm.bind(this)} color="default">
-              Cancelar
-            </Button>
-            <Button onClick={this.handleFormAction.bind(this)} color="primary">
-              Cadastrar
-            </Button>
-          </DialogActions>
-        </Dialog>
-      )
-    else
-      return (
-        <Button color="primary" variant="contained" 
-          onClick={this.toggleForm.bind(this)}>
-          <AddIcon /> Adicionar
-        </Button>
-      )
+    return (
+      <Dialog open={true} 
+      onClose={this.onClose.bind(this)} aria-labelledby="form-dialog-title">
+        <DialogTitle id="form-dialog-title">Subscribe</DialogTitle>
+        <DialogContent>
+          <TextField id="input-name" label="Nome" fullWidth 
+          defaultValue={this.initialValue('name')}/>
+          <TextField id="input-current-stock" label="Estoque atual" fullWidth 
+          defaultValue={this.initialValue('currentStock')}/>
+          <TextField id="input-min-stock" label="Estoque mín." fullWidth
+          defaultValue={this.initialValue('minStock')}/>
+          <TextField id="input-cost" label="Custo" fullWidth
+          defaultValue={this.initialValue('cost')}/>
+          <TextField id="input-price" label="Preço" fullWidth
+          defaultValue={this.initialValue('price')}/>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={this.onClose.bind(this)} color="default">
+            Cancelar
+          </Button>
+          <Button onClick={this.handleFormAction.bind(this)} color="primary">
+            { this.props.productData ? 'Atualizar' : 'Cadastrar'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+    )
   }
 }
