@@ -1,5 +1,5 @@
 type ProductItem = {
-  id?: string,
+  id?: number,
   name: string,
   currentStock: number,
   minStock: number,

@@ -81,7 +81,7 @@ export async function updateProduct(productId: string, data: any): Promise<Respo
   }
 }
 
-export async function removeProduct(productId: string): Promise<Response>{
+export async function removeProduct(productId: number): Promise<Response>{
   try{
     const res = await axios({
       method: 'delete',

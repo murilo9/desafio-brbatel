@@ -2,8 +2,8 @@ import React, { Component } from 'react'
 import DashboardState from '../types/DashboardState'
 import Cookies from 'js-cookie'
 import { Redirect } from 'react-router-dom'
-import {getProducts, createProduct} from '../services/Product'
-import { AppBar, Button, Container, Toolbar, Typography, Paper } from '@material-ui/core'
+import {getProducts, createProduct, removeProduct} from '../services/Product'
+import { AppBar, Button, Container, Toolbar, Typography, Paper, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Snackbar } from '@material-ui/core'
 import MenuIcon from '@material-ui/icons/Menu'
 import Table from '@material-ui/core/Table'
 import TableBody from '@material-ui/core/TableBody'
@@ -19,11 +19,20 @@ export default class Dashboard extends Component<{}, DashboardState> {
   constructor(props: {} | Readonly<{}>){
     super(props);
     this.state = {
-      products: [],
-      fetching: {
-        loadingProducts: true
+      products: [], // Lista de produtos
+      productToDelete: -1,  // ID do produto a ser deletado
+      fetching: {   // Indicadores de fetching server
+        loadingProducts: true,
+        deletingProduct: false
       },
-      session: {
+      dialog: {   // Modais
+        confirmProductExclusion: false
+      },
+      snackbar: {
+        show: false,
+        message: ''
+      },
+      session: {  // Dados da sessão
         token: '',
         user: ''
       }
@@ -45,16 +54,16 @@ export default class Dashboard extends Component<{}, DashboardState> {
         }
       })
     }
-    this.loadProducts()
   }
 
-  async loadProducts(){
+  async componentDidMount(){
     const products = await getProducts()
     if(products.success){
       this.setState({
         products: products.data,
         fetching: {
-          loadingProducts: false
+          loadingProducts: false,
+          deletingProduct: false
         }
       })
     } else {
@@ -74,12 +83,91 @@ export default class Dashboard extends Component<{}, DashboardState> {
     }
   }
 
-  async onUpdateProduct(productData: ProductAttributes){
+  async doUpdateProduct(){
 
   }
 
-  async onDeleteProduct(productId: number){
+  /**
+   * @desc Deleta o produto com o ID especificado em state.productToDelete
+   */
+  async doDeleteProduct(){
+    // Marca o início do fetch
+    this.setState({
+      fetching: {
+        deletingProduct: true,
+        loadingProducts: false
+      }
+    })
+    // Faz o fetch no server
+    const deleteReq = await removeProduct(this.state.productToDelete)
+    // Caso o fetch tenha sido bem-sucedido
+    if(deleteReq.success){
+      let products = this.state.products
+      let deletedProductId = this.state.productToDelete
+      let productIndex = products.findIndex(product => product.id === deletedProductId)
+      if(productIndex >= 0){
+        products.splice(productIndex, 1)
+      }
+      this.setState({
+        products,
+        snackbar: {
+          show: true,
+          message: 'Produto excluído com sucesso.'
+        }
+      })
+    }
+    // Caso o fetch não tenha sido bem-sucedido
+    else{
+      this.setState({
+        snackbar: {
+          show: true,
+          message: deleteReq.msg
+        }
+      })
+    }
+    // Marca o fim do fetch
+    this.setState({
+      dialog: {
+        confirmProductExclusion: false
+      },
+      fetching: {
+        loadingProducts: false,
+        deletingProduct: false
+      }
+    })
+  }
 
+  /**
+   * @desc Chamado após fechar o modal de confirmação de exclusão de produto.
+   */
+  confirmProductExclusionOnClose(){
+    this.setState({
+      dialog: {
+        confirmProductExclusion: false
+      }
+    })
+  }
+
+  openDeleteDialog(productToDelete: number){
+    this.setState({
+      productToDelete,
+      dialog: {
+        confirmProductExclusion: true
+      }
+    })
+  }
+
+  openUpdateForm(productId: number){
+
+  }
+
+  hideSnackbar(){
+    this.setState({
+      snackbar: {
+        show: false,
+        message: ''
+      }
+    })
   }
 
   logout(){
@@ -124,8 +212,9 @@ export default class Dashboard extends Component<{}, DashboardState> {
             { 
               this.state.products.map(product => 
                 <ProductItem productData={{...product}} 
-                delete={this.onDeleteProduct.bind(this)} 
-                update={this.onUpdateProduct.bind(this)}/>)
+                key={product.id}
+                delete={this.openDeleteDialog.bind(this)} 
+                update={this.openUpdateForm.bind(this)}/>)
             }
           </TableBody>
         </Table>
@@ -137,6 +226,8 @@ export default class Dashboard extends Component<{}, DashboardState> {
     if(this.state.session.token)
       return (
         <div className="App">
+
+          {/* Barra do topo */}
           <AppBar position="static">
             <Toolbar>
             { /* padding */}
@@ -148,6 +239,8 @@ export default class Dashboard extends Component<{}, DashboardState> {
               <Button color="inherit" onClick={this.logout.bind(this)}>Logout</Button>
             </Toolbar>
           </AppBar>
+
+          {/* Interface do Dashboard */}
           <main>
             <Container maxWidth="lg">
               <Typography variant="h4">
@@ -155,11 +248,40 @@ export default class Dashboard extends Component<{}, DashboardState> {
               </Typography>
               <ProductForm productData={null as unknown as ProductAttributes} 
                 create={this.onCreateProduct.bind(this)}
-                update={this.onUpdateProduct.bind(this)}
+                update={this.doUpdateProduct.bind(this)}
               />
             { this.productsTable() }
             </Container>
           </main>
+
+          {/* Dialog de confirmação de exclusão de produto */}
+          <Dialog
+            open={this.state.dialog.confirmProductExclusion}
+            onClose={this.confirmProductExclusionOnClose.bind(this)}
+            aria-labelledby="alert-dialog-title"
+            aria-describedby="alert-dialog-description"
+          >
+            <DialogTitle>Excluir Produto</DialogTitle>
+            <DialogContent>
+              <DialogContentText>
+                Deseja mesmo excluir este produto?
+              </DialogContentText>
+              <DialogActions>
+              <Button onClick={this.confirmProductExclusionOnClose.bind(this)} color="primary">
+                Cancelar
+              </Button>
+              <Button onClick={this.doDeleteProduct.bind(this)} color="primary" autoFocus>
+                {this.state.fetching.deletingProduct ? 'Excluindo...' : 'Excluir'}
+              </Button>
+              </DialogActions>
+            </DialogContent>
+          </Dialog>
+          
+          {/* Snackbar de feedback */}
+          <Snackbar open={this.state.snackbar.show} 
+          autoHideDuration={6000} 
+          onClose={this.hideSnackbar.bind(this)}
+          message={this.state.snackbar.message}/>
         </div>
       );
     else
