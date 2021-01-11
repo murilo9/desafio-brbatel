@@ -1,7 +1,7 @@
-import ProductItem from './ProductItem'
+import ProductAttributes from './ProductAttributes'
 
 type ProductFormProps = {
-  productData: ProductItem,
+  productData: ProductAttributes,
   create: Function,
   update: Function
 }

@@ -38,3 +38,13 @@ foi desenvolvida contendo o front-end e o back-end.
 
 - O back-end consiste numa API REST, onde se pode interagir com os recursos realizando
 requisições http na rota desejada utilizando o método adequado (GET, POST, PUT, DELETE).
+
+## Organização de Componentes
+
+```
+App
+  Login
+  Dashboard
+    ProductForm
+    ProductItem...
+```

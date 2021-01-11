@@ -1,7 +1,7 @@
-import ProductItem from './ProductItem'
+import ProductAttributes from './ProductAttributes'
 
 type DashboardState = {
-  products: Array<ProductItem>,
+  products: Array<ProductAttributes>,
   fetching: {
     loadingProducts: boolean
   },
