@@ -23,6 +23,9 @@ export class Product extends Model<Product> {
   })
   price: number;
 
+  @Column
+  picture: string;
+
   @CreatedAt
   created: Date
 

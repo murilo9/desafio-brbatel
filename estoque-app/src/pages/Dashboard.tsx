@@ -60,17 +60,23 @@ export default class Dashboard extends Component<{}, DashboardState> {
   }
 
   async componentDidMount(){
-    const products = await getProducts()
-    if(products.success){
+    const productsReq = await getProducts()
+    if(productsReq.success){
+      console.log(productsReq.data)
       this.setState({
-        products: products.data,
+        products: productsReq.data,
         fetching: {
           loadingProducts: false,
           deletingProduct: false
         }
       })
     } else {
-      //TODO: tratamento de erro ao carregar produtos
+      this.setState({
+        snackbar: {
+          message: 'Houve um erro ao carregar os produtos.',
+          show: true
+        }
+      })
     }
   }
 
@@ -284,9 +290,11 @@ export default class Dashboard extends Component<{}, DashboardState> {
     }
     else if(!this.state.products.length){
       return <Box mt={2}>
-        <Typography variant="subtitle1" gutterBottom>
-          Não há produtos registrados.
-        </Typography>
+        <Paper className="my-padded-paper">
+          <Typography variant="subtitle1" gutterBottom>
+            Não há produtos registrados.
+          </Typography>
+        </Paper>
       </Box>
     }
     else return (
@@ -296,6 +304,7 @@ export default class Dashboard extends Component<{}, DashboardState> {
             <TableHead>
               <TableRow>
                 <TableCell align="center" className="my-col-id">ID</TableCell>
+                <TableCell align="center" className="my-col-picture">Foto</TableCell>
                 <TableCell align="center" className="my-col-id-name">Nome</TableCell>
                 <TableCell align="center" className="my-col-current-stock">Estoque Atual</TableCell>
                 <TableCell align="center" className="my-col-min-stock">Estoque Mín.</TableCell>
@@ -384,9 +393,9 @@ export default class Dashboard extends Component<{}, DashboardState> {
             { this.renderProductForm() }
             { this.renderProductsTable() }
             <Box mt={2}>
-              <Paper className="my-statistics-paper">
+              <Paper className="my-padded-paper">
                 <Box mb={2}>
-                  <Typography variant="h5" component="h2">
+                  <Typography variant="subtitle1">
                     Estatísticas
                   </Typography>
                 </Box>

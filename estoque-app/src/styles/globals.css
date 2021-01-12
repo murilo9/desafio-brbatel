@@ -11,8 +11,11 @@ body {
   justify-content: space-between;
 }
 
-.my-statistics-paper {
+.my-padded-paper {
   padding: 16px;
+}
+.my-padded-paper h6 {
+  margin-bottom: 0;
 }
 
 .stock-low {
@@ -23,19 +26,48 @@ body {
 .my-qty {
   display: inline-block;
   width: 3rem;
+  overflow-x: visible;
+}
+
+.MuiDialogTitle-root {
+  padding-bottom: 0 !important;
+}
+
+.my-product-form-picture {
+  max-width: 80%;
+  max-height: 200px;
+  margin-top: 16px;
+}
+
+.my-product-picture {
+  max-width: 120px;
+  max-height: 120px;
 }
 
 @media (max-width: 768px){
-  .my-col-id, .my-col-min-stock {
+  .my-col-id, .my-col-min-stock, .my-col-cost {
     display: none !important;
   }
 }
 
 @media (max-width: 425px){
-  .my-col-cost, .my-col-price {
+  .my-col-cost, .my-col-price, .my-col-picture {
     display: none !important;
   }
   .MuiToolbar-gutters {
     padding-right: 0 !important;
+  }
+  .my-col-current-stock {
+    padding: 0 !important;
+  }
+  .my-product-stock-button {
+    padding: 0 !important;
+  }
+  .my-qty {
+    width: 2rem;
+    overflow-x: visible;
+  }
+  .my-product-action-button {
+    padding: 8px !important;
   }
 }

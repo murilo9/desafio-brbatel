@@ -44,7 +44,6 @@ export default class Login extends Component<{}, LoginState> {
   getLoginForm(): LoginForm {
     const loginInput = document.getElementById('input-username') as HTMLInputElement
     const passwordInput = document.getElementById('input-password') as HTMLInputElement
-    console.log(loginInput)
     return {
       username: loginInput ? loginInput.value : '',
       password: passwordInput ? passwordInput.value : ''

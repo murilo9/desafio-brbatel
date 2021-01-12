@@ -14,6 +14,16 @@ export default class Dashboard extends Component<ProductItemProps, {}> {
     return `R$ ${price.toFixed(2)}`
   }
 
+  renderPicture(){
+    if(this.props.productData.picture){
+      return <img src={this.props.productData.picture} 
+      className="my-product-picture" alt="Foto do Produto"/>
+    }
+    else {
+      return <span>Sem Foto</span>
+    }
+  }
+
   getStockClass(): string{
     return this.props.productData.currentStock < this.props.productData.minStock ? 'stock-low' : ''
   }
@@ -41,18 +51,23 @@ export default class Dashboard extends Component<ProductItemProps, {}> {
         <TableCell align="center" className="my-col-id">
           { this.props.productData.id }
         </TableCell>
+        <TableCell align="center" className="my-col-picture">
+          { this.renderPicture() }
+        </TableCell>
         <TableCell align="center" className="my-col-name">
           { this.props.productData.name }
         </TableCell>
         <TableCell align="center" 
         className={this.getStockClass() + ' my-col-current-stock'}>
-          <IconButton aria-label="delete" onClick={this.onDecreaseStock.bind(this)}>
+          <IconButton aria-label="delete" className="my-product-stock-button"
+            onClick={this.onDecreaseStock.bind(this)}>
             <MinusIcon />
           </IconButton>
           <span className="my-qty">
             { this.props.productData.currentStock }
           </span>
-          <IconButton aria-label="delete" onClick={this.onIncreaseStock.bind(this)}>
+          <IconButton aria-label="delete" className="my-product-stock-button"
+            onClick={this.onIncreaseStock.bind(this)}>
             <PlusIcon />
           </IconButton>
           </TableCell>
@@ -66,12 +81,14 @@ export default class Dashboard extends Component<ProductItemProps, {}> {
           { this.renderPrice(this.props.productData.price) }
         </TableCell>
         <TableCell align="center" className="my-col-empty" size="small" padding="none">
-          <IconButton aria-label="delete" onClick={this.onUpdate.bind(this)}>
+          <IconButton aria-label="update"  className="my-product-action-button"
+            onClick={this.onUpdate.bind(this)}>
             <EditIcon />
           </IconButton>
         </TableCell>
         <TableCell align="center" className="my-col-empty" size="small" padding="none">
-          <IconButton aria-label="delete" onClick={this.onDelete.bind(this)}>
+          <IconButton aria-label="delete"  className="my-product-action-button"
+            onClick={this.onDelete.bind(this)}>
             <DeleteIcon />
           </IconButton>
         </TableCell>

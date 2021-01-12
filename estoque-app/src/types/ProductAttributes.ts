@@ -4,7 +4,8 @@ type ProductItem = {
   currentStock: number,
   minStock: number,
   cost: number,
-  price: number
+  price: number,
+  picture: string | null
 }
 
 export default ProductItem

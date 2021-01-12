@@ -34,7 +34,6 @@ export async function getProducts(): Promise<Response>{
 export async function createProduct(data: any): Promise<Response>{
   const token = Cookies.get('token')
   try{
-    console.log(token)
     const res = await axios({
       method: 'post',
       url: 'http://127.0.0.1:8888/products',
@@ -88,6 +87,33 @@ export async function removeProduct(productId: number): Promise<Response>{
     const res = await axios({
       method: 'delete',
       url: `http://127.0.0.1:8888/product/${productId}`,
+      headers: {
+        'x-access-token': token
+      }
+    })
+    return {
+      success: true,
+      data: res.data,
+      msg: ''
+    }
+  } catch(e) {
+    return {
+      success: false,
+      data: null,
+      msg: e.response.data
+    }
+  }
+}
+
+export async function setTmpPicture(files: FileList){
+  const token = Cookies.get('token')
+  let formData = new FormData()
+  formData.append("file", files[0])
+  try{
+    const res = await axios({
+      method: 'post',
+      url: `http://127.0.0.1:8888/picture`,
+      data: formData,
       headers: {
         'x-access-token': token
       }
