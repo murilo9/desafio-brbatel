@@ -15,6 +15,7 @@ export default class ProductForm extends Component<ProductFormProps, {}> {
     const costInput = document.getElementById('input-cost') as HTMLInputElement
     const priceInput = document.getElementById('input-price') as HTMLInputElement
     const productData = {
+      id: this.props.productData?.id as number,
       name: nameInput ? nameInput.value : null,
       currentStock: currentStockInput ? parseInt(currentStockInput.value) : null,
       minStock: minStockInput ? parseInt(minStockInput.value) : null,

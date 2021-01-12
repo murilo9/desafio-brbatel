@@ -5,6 +5,8 @@ import ProductItemProps from '../types/ProductItemProps';
 import { IconButton } from '@material-ui/core';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
+import PlusIcon from '@material-ui/icons/AddCircleOutline'
+import MinusIcon from '@material-ui/icons/RemoveCircleOutline'
 
 export default class Dashboard extends Component<ProductItemProps, {}> {
 
@@ -24,6 +26,15 @@ export default class Dashboard extends Component<ProductItemProps, {}> {
     this.props.delete(this.props.productData.id)
   }
 
+  onIncreaseStock(){
+    this.props.increaseStock(this.props.productData.id)
+  }
+
+  onDecreaseStock(){
+    if(this.props.productData.currentStock >= 1)
+      this.props.decreaseStock(this.props.productData.id)
+  }
+
   render(){
     return (
       <TableRow>
@@ -35,7 +46,15 @@ export default class Dashboard extends Component<ProductItemProps, {}> {
         </TableCell>
         <TableCell align="center" 
         className={this.getStockClass() + ' my-col-current-stock'}>
-          { this.props.productData.currentStock }
+          <IconButton aria-label="delete" onClick={this.onDecreaseStock.bind(this)}>
+            <MinusIcon />
+          </IconButton>
+          <span className="my-qty">
+            { this.props.productData.currentStock }
+          </span>
+          <IconButton aria-label="delete" onClick={this.onIncreaseStock.bind(this)}>
+            <PlusIcon />
+          </IconButton>
           </TableCell>
         <TableCell align="center" className="my-col-min-stock">
           { this.props.productData.minStock }

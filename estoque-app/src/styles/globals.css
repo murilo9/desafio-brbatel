@@ -20,6 +20,11 @@ body {
   font-weight: bold !important;
 }
 
+.my-qty {
+  display: inline-block;
+  width: 3rem;
+}
+
 @media (max-width: 768px){
   .my-col-id, .my-col-min-stock {
     display: none !important;

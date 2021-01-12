@@ -96,14 +96,15 @@ export default class Dashboard extends Component<{}, DashboardState> {
     this.setState({
       showProductForm: false,
     })
+    // Pega o state.producToUpdate.id, pois o atributo id não existe no parâmetro productData
+    const productId = productData.id as number
     // Faz o fetch no server
-    const productId = this.state.productToUpdate?.id as number
     const updateReq = await updateProduct(productId, productData)
     // Caso o produto tenha sido atualizado com sucesso
     if(updateReq.success){
       // Atualiza a lista de produtos
       let products = this.state.products
-      let updatedProductId = this.state.productToUpdate?.id as number
+      let updatedProductId = productData?.id as number
       let productIndex = products.findIndex(product => product.id === updatedProductId)
       if(productIndex >= 0){
         products.splice(productIndex, 1, updateReq.data)
@@ -186,6 +187,40 @@ export default class Dashboard extends Component<{}, DashboardState> {
         confirmProductExclusion: false
       }
     })
+  }
+
+  async increaseStock(productId: number){
+    let productData = this.state.products.find(product => product.id === productId)
+    if(productData){
+      productData.currentStock += 1
+      productData.id = productId
+      this.doUpdateProduct(productData)
+    }
+    else {
+      this.setState({
+        snackbar: {
+          message: 'Houve um erro ao tentar atualizar o produto.',
+          show: true
+        }
+      })
+    }
+  }
+
+  async decreaseStock(productId: number){
+    let productData = this.state.products.find(product => product.id === productId)
+    if(productData){
+      productData.currentStock -= 1
+      productData.id = productId
+      this.doUpdateProduct(productData)
+    }
+    else {
+      this.setState({
+        snackbar: {
+          message: 'Houve um erro ao tentar atualizar o produto.',
+          show: true
+        }
+      })
+    }
   }
 
   openDeleteDialog(productToDelete: number){
@@ -276,7 +311,10 @@ export default class Dashboard extends Component<{}, DashboardState> {
                   <ProductItem productData={{...product}} 
                   key={product.id}
                   delete={this.openDeleteDialog.bind(this)} 
-                  update={this.openUpdateProductForm.bind(this)}/>)
+                  update={this.openUpdateProductForm.bind(this)}
+                  increaseStock={this.increaseStock.bind(this)}
+                  decreaseStock={this.decreaseStock.bind(this)}/>
+                )
               }
             </TableBody>
           </Table>
