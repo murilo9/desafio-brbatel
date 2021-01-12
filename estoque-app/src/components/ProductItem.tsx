@@ -27,23 +27,31 @@ export default class Dashboard extends Component<ProductItemProps, {}> {
   render(){
     return (
       <TableRow>
-        <TableCell align="center">
+        <TableCell align="center" className="my-col-id">
           { this.props.productData.id }
         </TableCell>
-        <TableCell align="center">{ this.props.productData.name }</TableCell>
+        <TableCell align="center" className="my-col-name">
+          { this.props.productData.name }
+        </TableCell>
         <TableCell align="center" 
-        className={this.getStockClass()}>
+        className={this.getStockClass() + ' my-col-current-stock'}>
           { this.props.productData.currentStock }
           </TableCell>
-        <TableCell align="center">{ this.props.productData.minStock }</TableCell>
-        <TableCell align="center">{ this.renderPrice(this.props.productData.cost) }</TableCell>
-        <TableCell align="center">{ this.renderPrice(this.props.productData.price) }</TableCell>
-        <TableCell align="center">
+        <TableCell align="center" className="my-col-min-stock">
+          { this.props.productData.minStock }
+        </TableCell>
+        <TableCell align="center" className="my-col-cost">
+          { this.renderPrice(this.props.productData.cost) }
+        </TableCell>
+        <TableCell align="center" className="my-col-price">
+          { this.renderPrice(this.props.productData.price) }
+        </TableCell>
+        <TableCell align="center" className="my-col-empty" size="small" padding="none">
           <IconButton aria-label="delete" onClick={this.onUpdate.bind(this)}>
             <EditIcon />
           </IconButton>
         </TableCell>
-        <TableCell align="center">
+        <TableCell align="center" className="my-col-empty" size="small" padding="none">
           <IconButton aria-label="delete" onClick={this.onDelete.bind(this)}>
             <DeleteIcon />
           </IconButton>

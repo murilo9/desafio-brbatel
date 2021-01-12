@@ -6,7 +6,7 @@ import LoginResponse from '../types/LoginResponse'
 import LoginState from '../types/LoginState'
 import LoginForm from '../types/LoginForm'
 import Button from '@material-ui/core/Button';
-import { Container, Grid, Snackbar, TextField, Typography } from '@material-ui/core';
+import { Card, CardContent, Container, Grid, Paper, Snackbar, TextField, Typography } from '@material-ui/core'
 
 export default class Login extends Component<{}, LoginState> {
 
@@ -42,8 +42,8 @@ export default class Login extends Component<{}, LoginState> {
   }
 
   getLoginForm(): LoginForm {
-    const loginInput = document.getElementById('input-username') as HTMLInputElement;
-    const passwordInput = document.getElementById('input-password') as HTMLInputElement;
+    const loginInput = document.getElementById('input-username') as HTMLInputElement
+    const passwordInput = document.getElementById('input-password') as HTMLInputElement
     console.log(loginInput)
     return {
       username: loginInput ? loginInput.value : '',
@@ -64,12 +64,12 @@ export default class Login extends Component<{}, LoginState> {
     })
     .then((res: LoginResponse) => {
       if(res.data.auth){
-        const { token, user } = res.data;
-        Cookies.set('token', token);
-        Cookies.set('user', user);
-        let expireDate = new Date();
-        expireDate.setHours(expireDate.getHours()+1);
-        Cookies.set('expire', expireDate.getTime() as unknown as string);
+        const { token, user } = res.data
+        Cookies.set('token', token)
+        Cookies.set('user', user)
+        let expireDate = new Date()
+        expireDate.setHours(expireDate.getHours()+1)
+        Cookies.set('expire', expireDate.getTime() as unknown as string)
         this.setState({
           session: {
             token, 
@@ -102,35 +102,41 @@ export default class Login extends Component<{}, LoginState> {
       return <Redirect to="/dashboard" />
     else 
       return (
-        <Container maxWidth="xs">
-          <Typography component="h1" variant="h4">Controle de Estoque</Typography>
-          <form noValidate onSubmit={this.login.bind(this)}>
-            <Grid container>
-              <Grid item xs={12}>
-                <TextField id="input-username" 
-                label="Login" 
-                fullWidth
-                variant="outlined" 
-                margin="normal"/>
-              </Grid>
-              <Grid item xs={12}>
-                <TextField id="input-password" 
-                label="Senha" 
-                fullWidth
-                variant="outlined" 
-                type="password" 
-                margin="normal"/>
-              </Grid>
-              <Button
-                type="submit"
-                fullWidth
-                variant="contained"
-                color="primary"
-              >
-                Login
-              </Button>
-            </Grid>
-          </form>
+        <Container maxWidth="xs" className="my-login-page">
+          <Card>
+            <CardContent>
+              <Typography component="h1" variant="h4" align="center">
+                Controle de Estoque
+              </Typography>
+              <form noValidate onSubmit={this.login.bind(this)}>
+                <Grid container>
+                  <Grid item xs={12}>
+                    <TextField id="input-username" 
+                    label="Login" 
+                    fullWidth
+                    variant="outlined" 
+                    margin="normal"/>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField id="input-password" 
+                    label="Senha" 
+                    fullWidth
+                    variant="outlined" 
+                    type="password" 
+                    margin="normal"/>
+                  </Grid>
+                  <Button
+                    type="submit"
+                    fullWidth
+                    variant="contained"
+                    color="primary"
+                  >
+                    Login
+                  </Button>
+                </Grid>
+              </form>
+            </CardContent>
+          </Card>
           <Snackbar open={this.state.snackbar.show} 
           autoHideDuration={6000} 
           onClose={this.handleClose.bind(this)}

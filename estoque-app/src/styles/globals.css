@@ -1,0 +1,36 @@
+body {
+  background-color: #dee4e7;
+}
+.my-login-page {
+  min-height: 100vh;
+  display: flex !important;
+  flex-direction: column;
+  justify-content: center;
+}
+.MuiToolbar-root {
+  justify-content: space-between;
+}
+
+.my-statistics-paper {
+  padding: 16px;
+}
+
+.stock-low {
+  color: red !important;
+  font-weight: bold !important;
+}
+
+@media (max-width: 768px){
+  .my-col-id, .my-col-min-stock {
+    display: none !important;
+  }
+}
+
+@media (max-width: 425px){
+  .my-col-cost, .my-col-price {
+    display: none !important;
+  }
+  .MuiToolbar-gutters {
+    padding-right: 0 !important;
+  }
+}

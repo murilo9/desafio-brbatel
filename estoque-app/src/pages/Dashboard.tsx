@@ -3,8 +3,8 @@ import DashboardState from '../types/DashboardState'
 import Cookies from 'js-cookie'
 import { Redirect } from 'react-router-dom'
 import {getProducts, createProduct, removeProduct, updateProduct} from '../services/Product'
-import { AppBar, Button, Container, Toolbar, Typography, Paper, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Snackbar } from '@material-ui/core'
-import MenuIcon from '@material-ui/icons/Menu'
+import { AppBar, Button, Container, Toolbar, Typography, Paper, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Snackbar, Box, IconButton, CardContent, Card } from '@material-ui/core'
+import LogoutIcon from '@material-ui/icons/ExitToApp'
 import AddIcon from '@material-ui/icons/Add'
 import Table from '@material-ui/core/Table'
 import TableBody from '@material-ui/core/TableBody'
@@ -225,43 +225,63 @@ export default class Dashboard extends Component<{}, DashboardState> {
     })
   }
 
+  getProductsTotal(){
+    return this.state.products.length
+  }
+
+  getBruteProfit(){
+    let bruteIncome = 0
+    let bruteCost = 0
+    this.state.products.forEach(product => {
+      bruteIncome += (product.price * product.currentStock)
+      bruteCost += (product.cost * product.currentStock)
+    })
+    return (bruteIncome - bruteCost).toFixed(2)
+  }
+
   renderProductsTable(){
     if(this.state.fetching.loadingProducts){
-      return <Typography variant="subtitle1" gutterBottom>
-        Carregando produtos...
-      </Typography>
+      return <Box mt={2}>
+        <Typography variant="subtitle1" gutterBottom>
+          Carregando produtos...
+        </Typography>
+      </Box>
     }
     else if(!this.state.products.length){
-      return <Typography variant="subtitle1" gutterBottom>
-        Não há produtos registrados.
-      </Typography>
+      return <Box mt={2}>
+        <Typography variant="subtitle1" gutterBottom>
+          Não há produtos registrados.
+        </Typography>
+      </Box>
     }
     else return (
-      <TableContainer component={Paper}>
-        <Table aria-label="simple table">
-          <TableHead>
-            <TableRow>
-              <TableCell align="center">ID</TableCell>
-              <TableCell align="center">Nome</TableCell>
-              <TableCell align="center">Estoque Atual</TableCell>
-              <TableCell align="center">Estoque Mín.</TableCell>
-              <TableCell align="center">Custo</TableCell>
-              <TableCell align="center">Preço</TableCell>
-              <TableCell align="center"></TableCell>
-              <TableCell align="center"></TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            { 
-              this.state.products.map(product => 
-                <ProductItem productData={{...product}} 
-                key={product.id}
-                delete={this.openDeleteDialog.bind(this)} 
-                update={this.openUpdateProductForm.bind(this)}/>)
-            }
-          </TableBody>
-        </Table>
-      </TableContainer>
+      <Box mt={2}>
+        <TableContainer component={Paper}>
+          <Table aria-label="simple table">
+            <TableHead>
+              <TableRow>
+                <TableCell align="center" className="my-col-id">ID</TableCell>
+                <TableCell align="center" className="my-col-id-name">Nome</TableCell>
+                <TableCell align="center" className="my-col-current-stock">Estoque Atual</TableCell>
+                <TableCell align="center" className="my-col-min-stock">Estoque Mín.</TableCell>
+                <TableCell align="center" className="my-col-cost">Custo</TableCell>
+                <TableCell align="center" className="my-col-price">Preço</TableCell>
+                <TableCell align="center" className="my-col-empty" padding="none"></TableCell>
+                <TableCell align="center" className="my-col-empty" padding="none"></TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              { 
+                this.state.products.map(product => 
+                  <ProductItem productData={{...product}} 
+                  key={product.id}
+                  delete={this.openDeleteDialog.bind(this)} 
+                  update={this.openUpdateProductForm.bind(this)}/>)
+              }
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Box>
     )
   }
 
@@ -298,24 +318,48 @@ export default class Dashboard extends Component<{}, DashboardState> {
           {/* Barra do topo */}
           <AppBar position="static">
             <Toolbar>
-            { /* padding */}
-              <MenuIcon />
               <Typography variant="h6">
                 Controle de Estoque
               </Typography>
-              { /* flex-grow: 1 */}
-              <Button color="inherit" onClick={this.logout.bind(this)}>Logout</Button>
+                <Box display={{xs: 'none', sm: 'block'}}>
+                  <Button color="inherit" 
+                    onClick={this.logout.bind(this)}>
+                      Logout
+                  </Button>
+                </Box>
+                <Box display={{xs: 'block', sm: 'none'}}>
+                  <IconButton>
+                    <LogoutIcon />
+                  </IconButton>
+                </Box>
             </Toolbar>
           </AppBar>
 
           {/* Interface do Dashboard */}
           <main>
             <Container maxWidth="lg">
-              <Typography variant="h4">
-                Produtos
-              </Typography>
+              <Box mt={3} mb={2}>
+                <Typography variant="h4">
+                  Produtos
+                </Typography>
+              </Box>
             { this.renderProductForm() }
             { this.renderProductsTable() }
+            <Box mt={2}>
+              <Paper className="my-statistics-paper">
+                <Box mb={2}>
+                  <Typography variant="h5" component="h2">
+                    Estatísticas
+                  </Typography>
+                </Box>
+                <Typography variant="subtitle1" gutterBottom>
+                  Total de produtos: <strong>{ this.getProductsTotal() }</strong>
+                </Typography>
+                <Typography variant="subtitle1" gutterBottom>
+                  Lucro bruto: R$ <strong>{ this.getBruteProfit() }</strong>
+                </Typography>
+              </Paper>
+            </Box>
             </Container>
           </main>
 

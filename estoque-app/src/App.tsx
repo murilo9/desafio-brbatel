@@ -4,6 +4,7 @@ import {
   Switch,
   Route,
 } from "react-router-dom";
+import './styles/globals.css';
 
 // Import das pages
 import Login from './pages/Login'
