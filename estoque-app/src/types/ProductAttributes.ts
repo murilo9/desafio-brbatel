@@ -1,3 +1,6 @@
+/**
+ * Define os atributos de um produto
+ */
 type ProductItem = {
   id?: number,
   name: string,
@@ -5,7 +8,7 @@ type ProductItem = {
   minStock: number,
   cost: number,
   price: number,
-  picture: string | null
+  picture: string | null  // URL da imagem
 }
 
 export default ProductItem

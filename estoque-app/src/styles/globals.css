@@ -1,72 +1,82 @@
+/* Define a cor de fundo padrão */
 body {
   background-color: #dee4e7;
 }
+/* Faz a página de login alinhar o conteúdo verticalmente no centro */
 .my-login-page {
   min-height: 100vh;
   display: flex !important;
   flex-direction: column;
   justify-content: center;
 }
+/* Ajuste para a topbar exibir os elementos nos cantos */
 .MuiToolbar-root {
   justify-content: space-between;
 }
-
+/* Adiciona um padding aos papers */
 .my-padded-paper {
   padding: 16px;
 }
+/* Ajuste para eliminar a margin-bottom do texto dos papers */
 .my-padded-paper h6 {
   margin-bottom: 0;
 }
-
+/* Aplica um destaque aos produtos com estoque baixo */
 .stock-low {
   color: red !important;
   font-weight: bold !important;
 }
-
+/* Deixa a quantidade de estoque mais espaçosa */
 .my-qty {
   display: inline-block;
   width: 3rem;
   overflow-x: visible;
 }
-
+/* Ajuste para eliminar o padding-bottom do título dos dialogs */
 .MuiDialogTitle-root {
   padding-bottom: 0 !important;
 }
-
+/* Impõe um limite nas dimensões da imagem de produto no form */
 .my-product-form-picture {
   max-width: 80%;
   max-height: 200px;
   margin-top: 16px;
 }
-
+/* Impõe um limite nas dimensões das imagens dos produtos na tabela */
 .my-product-picture {
   max-width: 120px;
   max-height: 120px;
 }
 
 @media (max-width: 768px){
+  /* Oculta as colunas de ID, estoque mínimo e custo no tablet */
   .my-col-id, .my-col-min-stock, .my-col-cost {
     display: none !important;
   }
 }
 
 @media (max-width: 425px){
-  .my-col-cost, .my-col-price, .my-col-picture {
+  /* Oculta as colunas de preço e foto no celular */
+  .my-col-price, .my-col-picture {
     display: none !important;
   }
+  /* Ajuste que aproxima o botão pra direita na topbar */
   .MuiToolbar-gutters {
     padding-right: 0 !important;
   }
+  /* Elimina o padding da coluna de estoque atual */
   .my-col-current-stock {
     padding: 0 !important;
   }
+  /* Elimina o padding do botão de estoque */
   .my-product-stock-button {
     padding: 0 !important;
   }
+  /* Diminui a largura do indicador de estoque atual */
   .my-qty {
     width: 2rem;
-    overflow-x: visible;
   }
+  /* Reduz o padding dos botões de ação do produto na tabela */
   .my-product-action-button {
     padding: 8px !important;
   }

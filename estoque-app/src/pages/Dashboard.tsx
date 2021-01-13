@@ -1,8 +1,16 @@
+/**
+ * Página de Dashboard
+ * Contém a topbar com botão de logout, a tabela de produtos, o botão de
+ * adicionar produtos e o display de estatísticas.
+ */
+
+// Import das libs
 import React, { Component } from 'react'
-import DashboardState from '../types/DashboardState'
 import Cookies from 'js-cookie'
 import { Redirect } from 'react-router-dom'
+// Import dos services
 import {getProducts, createProduct, removeProduct, updateProduct} from '../services/Product'
+// Import dos componentes do Material UI
 import { AppBar, Button, Container, Toolbar, Typography, Paper, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Snackbar, Box, IconButton, CardContent, Card } from '@material-ui/core'
 import LogoutIcon from '@material-ui/icons/ExitToApp'
 import AddIcon from '@material-ui/icons/Add'
@@ -12,36 +20,49 @@ import TableCell from '@material-ui/core/TableCell'
 import TableContainer from '@material-ui/core/TableContainer'
 import TableHead from '@material-ui/core/TableHead'
 import TableRow from '@material-ui/core/TableRow'
+// Import dos types
 import ProductForm from '../components/ProductForm'
 import ProductAttributes from '../types/ProductAttributes'
 import ProductItem from '../components/ProductItem'
+import DashboardState from '../types/DashboardState'
 
 export default class Dashboard extends Component<{}, DashboardState> {
   constructor(props: {} | Readonly<{}>){
     super(props);
     this.state = {
-      products: [], // Lista de produtos
-      productToDelete: -1,  // ID do produto a ser deletado
-      productToUpdate: undefined,  // Dados do produto a ser atualizado
+      // Lista de produtos
+      products: [], 
+      // ID do produto a ser deletado
+      productToDelete: -1,  
+      // Dados do produto a ser atualizado
+      productToUpdate: undefined,  
+      // Exibe o modal com formulário de produto
       showProductForm: false,
-      fetching: {   // Indicadores de fetching server
+      // Indicadores de fetching server
+      fetching: {   
         loadingProducts: true,
         deletingProduct: false
       },
-      dialog: {   // Modais
+      // Modais
+      dialog: {   
         confirmProductExclusion: false
       },
+      // Snackbar de feedback
       snackbar: {
         show: false,
         message: ''
       },
-      session: {  // Dados da sessão
+      // Dados da sessão
+      session: {  
         token: '',
         user: ''
       }
     }
   }
 
+  /**
+   * Antes do component ser montado, verifica se a sessão está ativa
+   */
   componentWillMount(){
     const expireDateMilis = parseInt(Cookies.get('expire') as string)
     // Se a sessão tiver expirado, faz logout
@@ -59,27 +80,40 @@ export default class Dashboard extends Component<{}, DashboardState> {
     }
   }
 
+  /**
+   * Assim que o component for montado, carrega a lista de produtos cadastrados
+   */
   async componentDidMount(){
+    // Faz a requisição através do service
     const productsReq = await getProducts()
+    //Caso a requisição tenha sido bem-sucedida
     if(productsReq.success){
-      console.log(productsReq.data)
       this.setState({
+        // Seta a lista de produtos
         products: productsReq.data,
+        // Indica que o fetch terminou e permite que os produtos sejam exibidos
         fetching: {
           loadingProducts: false,
           deletingProduct: false
         }
       })
-    } else {
+    } 
+    // Em casao de falha na requisição
+    else {
       this.setState({
+        // Exibe mensagem de feedback
         snackbar: {
-          message: 'Houve um erro ao carregar os produtos.',
+          message: productsReq.msg,
           show: true
         }
       })
     }
   }
 
+  /**
+   * Método executado ao submeter o form para cadastrar um produto.
+   * @param productData Dados do produto a ser cadsatrado
+   */
   async onCreateProduct(productData: ProductAttributes){
     const createRequest = await createProduct(productData)
     if(createRequest.success){
@@ -97,15 +131,17 @@ export default class Dashboard extends Component<{}, DashboardState> {
     }
   }
 
-  async doUpdateProduct(productData: ProductAttributes){
+  /**
+   * Método executado ao submeter o form para atualizar um produto.
+   * @param productData Dados do produto a ser atualizado
+   */
+  async onUpdateProduct(productData: ProductAttributes){
     // Fecha o form de produto
     this.setState({
       showProductForm: false,
     })
-    // Pega o state.producToUpdate.id, pois o atributo id não existe no parâmetro productData
-    const productId = productData.id as number
     // Faz o fetch no server
-    const updateReq = await updateProduct(productId, productData)
+    const updateReq = await updateProduct(productData)
     // Caso o produto tenha sido atualizado com sucesso
     if(updateReq.success){
       // Atualiza a lista de produtos
@@ -115,6 +151,7 @@ export default class Dashboard extends Component<{}, DashboardState> {
       if(productIndex >= 0){
         products.splice(productIndex, 1, updateReq.data)
       }
+      // Exibe mensagem de feedback
       this.setState({
         products,
         snackbar: {
@@ -125,6 +162,7 @@ export default class Dashboard extends Component<{}, DashboardState> {
     }
     // Caso haja falha na atualização
     else {
+      // Exibe mensagem de erro
       this.setState({
         snackbar: {
           show: true,
@@ -135,9 +173,9 @@ export default class Dashboard extends Component<{}, DashboardState> {
   }
 
   /**
-   * @desc Deleta o produto com o ID especificado em state.productToDelete
+   * Deleta o produto com o ID especificado em state.productToDelete.
    */
-  async doDeleteProduct(){
+  async onDeleteProduct(){
     // Marca o início do fetch
     this.setState({
       fetching: {
@@ -149,12 +187,14 @@ export default class Dashboard extends Component<{}, DashboardState> {
     const deleteReq = await removeProduct(this.state.productToDelete)
     // Caso o fetch tenha sido bem-sucedido
     if(deleteReq.success){
+      // Atualiza a lista de produtos
       let products = this.state.products
       let deletedProductId = this.state.productToDelete
       let productIndex = products.findIndex(product => product.id === deletedProductId)
       if(productIndex >= 0){
         products.splice(productIndex, 1)
       }
+      // Exibe mensagem de feedback
       this.setState({
         products,
         snackbar: {
@@ -166,6 +206,7 @@ export default class Dashboard extends Component<{}, DashboardState> {
     // Caso o fetch não tenha sido bem-sucedido
     else{
       this.setState({
+        // Exibe mensagem de erro
         snackbar: {
           show: true,
           message: deleteReq.msg
@@ -185,7 +226,7 @@ export default class Dashboard extends Component<{}, DashboardState> {
   }
 
   /**
-   * @desc Chamado após fechar o modal de confirmação de exclusão de produto.
+   * Fecha o modal de confirmação de exclusão de produto.
    */
   confirmProductExclusionOnClose(){
     this.setState({
@@ -195,13 +236,22 @@ export default class Dashboard extends Component<{}, DashboardState> {
     })
   }
 
+  /**
+   * Incrementa o estoque de um produto.
+   * @param productId ID do produto
+   */
   async increaseStock(productId: number){
+    // Produra o produo
     let productData = this.state.products.find(product => product.id === productId)
+    // Se o produto for encontrado
     if(productData){
+      // Incrementa o estoque
       productData.currentStock += 1
       productData.id = productId
-      this.doUpdateProduct(productData)
+      // Chama o service para atualizar o produto
+      this.onUpdateProduct(productData)
     }
+    // Caso o produto não exista
     else {
       this.setState({
         snackbar: {
@@ -212,13 +262,22 @@ export default class Dashboard extends Component<{}, DashboardState> {
     }
   }
 
+  /**
+   * Decrementa o estoque de um produto.
+   * @param productId ID do produto
+   */
   async decreaseStock(productId: number){
+    // Procura o produto
     let productData = this.state.products.find(product => product.id === productId)
+    // Se o produto for encontrado
     if(productData){
+      // Decrementa o estoque
       productData.currentStock -= 1
       productData.id = productId
-      this.doUpdateProduct(productData)
+      // Chama o service para atualizar o produto
+      this.onUpdateProduct(productData)
     }
+    // Caso o produto não exista
     else {
       this.setState({
         snackbar: {
@@ -229,6 +288,10 @@ export default class Dashboard extends Component<{}, DashboardState> {
     }
   }
 
+  /**
+   * Abre o modal de confirmação de exclusão do produto.
+   * @param productToDelete ID do produto
+   */
   openDeleteDialog(productToDelete: number){
     this.setState({
       productToDelete,
@@ -238,6 +301,10 @@ export default class Dashboard extends Component<{}, DashboardState> {
     })
   }
 
+  /**
+   * Abre o modal com o formulário de atualizar produto.
+   * @param productToUpdate Dados do produto a ser atualizado
+   */
   openUpdateProductForm(productToUpdate: ProductAttributes){
     this.setState({
       productToUpdate,
@@ -245,6 +312,9 @@ export default class Dashboard extends Component<{}, DashboardState> {
     })
   }
 
+  /**
+   * Oculta a snackbar.
+   */
   hideSnackbar(){
     this.setState({
       snackbar: {
@@ -254,10 +324,15 @@ export default class Dashboard extends Component<{}, DashboardState> {
     })
   }
 
+  /**
+   * Realiza logout.
+   */
   logout(){
+    // Limpa os cookies
     Cookies.remove('token')
     Cookies.remove('user')
     Cookies.remove('expire')
+    // Remove os dados da sessão no state
     this.setState({
       session: {
         token: '',
@@ -266,10 +341,16 @@ export default class Dashboard extends Component<{}, DashboardState> {
     })
   }
 
+  /**
+   * Retorna o total de produtos.
+   */
   getProductsTotal(){
     return this.state.products.length
   }
 
+  /**
+   * Retorna o lucro bruto (total de preços - total de custos).
+   */
   getBruteProfit(){
     let bruteIncome = 0
     let bruteCost = 0
@@ -280,6 +361,9 @@ export default class Dashboard extends Component<{}, DashboardState> {
     return (bruteIncome - bruteCost).toFixed(2)
   }
 
+  /**
+   * Component funcional que renderiza a tabela de produtos.
+   */
   renderProductsTable(){
     if(this.state.fetching.loadingProducts){
       return <Box mt={2}>
@@ -332,6 +416,9 @@ export default class Dashboard extends Component<{}, DashboardState> {
     )
   }
 
+  /**
+   * Ativa/desativa o modal de formulário de produto.
+   */
   toggleProductForm(){
     this.setState({
       showProductForm: !this.state.showProductForm,
@@ -339,13 +426,16 @@ export default class Dashboard extends Component<{}, DashboardState> {
     })
   }
 
+  /**
+   * Component funcional que renderiza o modal do formulário de produto.
+   */
   renderProductForm(){
     if(this.state.showProductForm)
       return (
         <ProductForm 
           productData={this.state.productToUpdate} 
           create={this.onCreateProduct.bind(this)}
-          update={this.doUpdateProduct.bind(this)}
+          update={this.onUpdateProduct.bind(this)}
           close={this.toggleProductForm.bind(this)}
         />
       )
@@ -357,12 +447,17 @@ export default class Dashboard extends Component<{}, DashboardState> {
     )
   }
 
+  /**
+   * Renderiza a página de Dashboard.
+   */
   render(){
+    // Se a sessão esitver ativa, renderiza a página
     if(this.state.session.token)
       return (
         <div className="App">
 
           {/* Barra do topo */}
+
           <AppBar position="static">
             <Toolbar>
               <Typography variant="h6">
@@ -383,6 +478,7 @@ export default class Dashboard extends Component<{}, DashboardState> {
           </AppBar>
 
           {/* Interface do Dashboard */}
+
           <main>
             <Container maxWidth="lg">
               <Box mt={3} mb={2}>
@@ -411,6 +507,7 @@ export default class Dashboard extends Component<{}, DashboardState> {
           </main>
 
           {/* Dialog de confirmação de exclusão de produto */}
+          
           <Dialog
             open={this.state.dialog.confirmProductExclusion}
             onClose={this.confirmProductExclusionOnClose.bind(this)}
@@ -426,7 +523,7 @@ export default class Dashboard extends Component<{}, DashboardState> {
               <Button onClick={this.confirmProductExclusionOnClose.bind(this)} color="primary">
                 Cancelar
               </Button>
-              <Button onClick={this.doDeleteProduct.bind(this)} color="primary" autoFocus>
+              <Button onClick={this.onDeleteProduct.bind(this)} color="primary" autoFocus>
                 {this.state.fetching.deletingProduct ? 'Excluindo...' : 'Excluir'}
               </Button>
               </DialogActions>
@@ -434,12 +531,14 @@ export default class Dashboard extends Component<{}, DashboardState> {
           </Dialog>
           
           {/* Snackbar de feedback */}
+          
           <Snackbar open={this.state.snackbar.show} 
           autoHideDuration={6000} 
           onClose={this.hideSnackbar.bind(this)}
           message={this.state.snackbar.message}/>
         </div>
       );
+    // Se a sessão tiver expirado, redireciona pra página inicial (de login)
     else
       return <Redirect to="/"/>
   }

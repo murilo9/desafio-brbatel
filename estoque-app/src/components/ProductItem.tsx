@@ -1,19 +1,34 @@
+/**
+ * Item de produto
+ * Renderiza uma linha com os dados de um produto na tabela.
+ */
+
+ // Import das libs
 import React, { Component } from 'react'
-import TableCell from '@material-ui/core/TableCell';
-import TableRow from '@material-ui/core/TableRow';
-import ProductItemProps from '../types/ProductItemProps';
-import { IconButton } from '@material-ui/core';
-import DeleteIcon from '@material-ui/icons/Delete';
-import EditIcon from '@material-ui/icons/Edit';
+// Import dos components do Material UI
+import TableCell from '@material-ui/core/TableCell'
+import TableRow from '@material-ui/core/TableRow'
+import { IconButton } from '@material-ui/core'
+import DeleteIcon from '@material-ui/icons/Delete'
+import EditIcon from '@material-ui/icons/Edit'
 import PlusIcon from '@material-ui/icons/AddCircleOutline'
 import MinusIcon from '@material-ui/icons/RemoveCircleOutline'
+// Import dos types
+import ProductItemProps from '../types/ProductItemProps'
 
 export default class Dashboard extends Component<ProductItemProps, {}> {
 
+  /**
+   * Renderiza o preço no formato monetário com cifrão.
+   * @param price Preço
+   */
   renderPrice(price: number){
     return `R$ ${price.toFixed(2)}`
   }
 
+  /**
+   * Renderiza a foto de um produto, se houver.
+   */
   renderPicture(){
     if(this.props.productData.picture){
       return <img src={this.props.productData.picture} 
@@ -24,27 +39,46 @@ export default class Dashboard extends Component<ProductItemProps, {}> {
     }
   }
 
+  /**
+   * Retorna a classe CSS da quantidade em estoque, para indicar se está 
+   * abaixo do estoque mínimo.
+   */
   getStockClass(): string{
     return this.props.productData.currentStock < this.props.productData.minStock ? 'stock-low' : ''
   }
 
+  /**
+   * Método chamado ao clicar no botão de editar produto.
+   */
   onUpdate(){
     this.props.update(this.props.productData)
   }
 
+  /**
+   * Método chamado ao clicar no botão de excluir produto.
+   */
   onDelete(){
     this.props.delete(this.props.productData.id)
   }
 
+  /**
+   * Método chamado ao clicar no botão de incrementar estoque do produto.
+   */
   onIncreaseStock(){
     this.props.increaseStock(this.props.productData.id)
   }
 
+  /**
+   * Método chamado ao clicar no botão de decrementar estoque do produto.
+   */
   onDecreaseStock(){
     if(this.props.productData.currentStock >= 1)
       this.props.decreaseStock(this.props.productData.id)
   }
 
+  /**
+   * Renderiza o modal de formulário de produto.
+   */
   render(){
     return (
       <TableRow>

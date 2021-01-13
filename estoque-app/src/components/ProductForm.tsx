@@ -1,27 +1,43 @@
-import { Box, Button, TextField } from '@material-ui/core'
+/**
+ * Component de formulário de produto
+ * Exibe um modal que contém um formulário utilizado para
+ * criar ou atualizar um produto.
+ */
+
+// Import das libs
 import React, { Component } from 'react'
+// Import dos types
 import ProductFormProps from '../types/ProductFormProps'
+// Import dos services
+import {uploadPicture} from '../services/Product'
+// Import dos components do Material UI
+import { Box, Button, TextField } from '@material-ui/core'
 import Dialog from '@material-ui/core/Dialog'
 import DialogActions from '@material-ui/core/DialogActions'
 import DialogContent from '@material-ui/core/DialogContent'
 import DialogTitle from '@material-ui/core/DialogTitle'
-import {setTmpPicture} from '../services/Product'
 
 export default class ProductForm extends Component<ProductFormProps, {pictureUrl: string}> {
 
   constructor(props: ProductFormProps){
     super(props)
     this.state = {
+      // URL da foto do produto
       pictureUrl: ''
     }
   }
 
+  /**
+   * Método executado ao submeter o formulário para criar ou atualizar o produto.
+   */
   handleFormAction(){
+    // Referencia os inputs de texto
     const nameInput = document.getElementById('input-name') as HTMLInputElement
     const currentStockInput = document.getElementById('input-current-stock') as HTMLInputElement
     const minStockInput = document.getElementById('input-min-stock') as HTMLInputElement
     const costInput = document.getElementById('input-cost') as HTMLInputElement
     const priceInput = document.getElementById('input-price') as HTMLInputElement
+    // Constrói o objeto contendo os dados do produto
     const productData = {
       id: this.props.productData?.id as number,
       name: nameInput ? nameInput.value : null,
@@ -31,27 +47,39 @@ export default class ProductForm extends Component<ProductFormProps, {pictureUrl
       price: priceInput ? parseFloat(priceInput.value) : null,
       picture: this.state.pictureUrl ? this.state.pictureUrl : null
     }
-    // Se estiver atualziando um produto
+    // Se estiver atualizando um produto
     if(this.props.productData){
       this.props.update(productData)
     }
-    // Se estiver criando um novo produto
+    // Se estiver cadastrando um novo produto
     else {
       this.props.create(productData)
     }
   }
 
+  /**
+   * Fecha este modal
+   */
   onClose(){
     this.props.close()
   }
 
+  /**
+   * Método executado quando uma imagem for inserida no file input.
+   */
   async onPutPicture(){
+    // Referencia o file input
     const imageInput = document.getElementById('file-input') as HTMLInputElement
+    // Se houver um arquivo no file input
     if(imageInput.files?.length){
-      const uploadReq = await setTmpPicture(imageInput.files as FileList)
+      // Chama o serviço para fazer upload da imagem
+      const uploadReq = await uploadPicture(imageInput.files as FileList)
+      // Caso o upload tenha sido bem-sucedido
       if(uploadReq.success){
+        // Monta a URL da imagem
         let pictureUrl = 'http://127.0.0.1:8888/pictures/'
         pictureUrl += uploadReq.data.name + uploadReq.data.extention
+        // Insere a URL nos atributos do produto
         this.setState({
           pictureUrl
         })
@@ -62,6 +90,9 @@ export default class ProductForm extends Component<ProductFormProps, {pictureUrl
     }
   }
 
+  /**
+   * Renderiza a foto do produto, se houver.
+   */
   renderPicture(){
     if(this.state.pictureUrl){
       return <img src={this.state.pictureUrl} 
@@ -71,10 +102,17 @@ export default class ProductForm extends Component<ProductFormProps, {pictureUrl
     }
   }
 
+  /**
+   * Retorna o título do modal.
+   */
   getTitle(){
     return this.props.productData ? 'Editar Produto' : 'Cadastrar Produto'
   }
 
+  /**
+   * Retorna o valor inicial de um campo do formulário.
+   * @param field Nome do campo
+   */
   initialValue(field: string){
     if(this.props.productData){
       switch(field){
@@ -95,6 +133,9 @@ export default class ProductForm extends Component<ProductFormProps, {pictureUrl
     else return ''
   }
 
+  /**
+   * Renderiza o modal de formulário de produto.
+   */
   render(){
     return (
       <Dialog open={true} 

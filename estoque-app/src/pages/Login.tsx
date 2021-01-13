@@ -1,12 +1,15 @@
+// Imports das libs
 import React, { Component } from 'react'
 import axios from 'axios'
 import Cookies from 'js-cookie'
 import { Redirect } from 'react-router-dom'
+// Import dos components do Material UI
+import LoginForm from '../types/LoginForm'
+import Button from '@material-ui/core/Button'
+import { Card, CardContent, Container, Grid, Snackbar, TextField, Typography } from '@material-ui/core'
+// Import dos types
 import LoginResponse from '../types/LoginResponse'
 import LoginState from '../types/LoginState'
-import LoginForm from '../types/LoginForm'
-import Button from '@material-ui/core/Button';
-import { Card, CardContent, Container, Grid, Paper, Snackbar, TextField, Typography } from '@material-ui/core'
 
 export default class Login extends Component<{}, LoginState> {
 
@@ -24,9 +27,12 @@ export default class Login extends Component<{}, LoginState> {
     }
   }
 
+  /**
+   * Antes do component ser montado, verifica se a sessão está ativa
+   */
   componentWillMount(){
     const expireDateMilis = parseInt(Cookies.get('expire') as string)
-    // Se houver a data de expiração da sessão slava nos cookies
+    // Se houver a data de expiração da sessão salva nos cookies
     if(expireDateMilis){
       // Se a sessão não tiver expirado
       if(expireDateMilis >= new Date().getTime()){
@@ -41,6 +47,9 @@ export default class Login extends Component<{}, LoginState> {
     }
   }
 
+  /**
+   * Retorna um objeto contendo o username e password para realizar login.
+   */
   getLoginForm(): LoginForm {
     const loginInput = document.getElementById('input-username') as HTMLInputElement
     const passwordInput = document.getElementById('input-password') as HTMLInputElement
@@ -50,9 +59,14 @@ export default class Login extends Component<{}, LoginState> {
     }
   }
 
+  /**
+   * Faz a requisição para realizar login.
+   * @param event 
+   */
   login(event: React.FormEvent<HTMLFormElement>){
     event.preventDefault()
     const { username, password } = this.getLoginForm();
+    // Faz a requisição na rota de login
     axios({
       method: 'post',
       url: 'http://127.0.0.1:8888/login',
@@ -62,13 +76,18 @@ export default class Login extends Component<{}, LoginState> {
       }
     })
     .then((res: LoginResponse) => {
+      // Se o login foi bem-sucedido
       if(res.data.auth){
+        // Coleta o token de acesso e o username
         const { token, user } = res.data
+        // Salva os dados no cookie
         Cookies.set('token', token)
         Cookies.set('user', user)
+        // Seta a data de expiração (1 hora)
         let expireDate = new Date()
         expireDate.setHours(expireDate.getHours()+1)
         Cookies.set('expire', expireDate.getTime() as unknown as string)
+        // Guarda os dados da sessão no state
         this.setState({
           session: {
             token, 
@@ -77,7 +96,9 @@ export default class Login extends Component<{}, LoginState> {
         })
       }
     })
+    // Em caso de falha na requisição
     .catch(e => {
+      // Exibe a mensagem de alerta
       this.setState({
         snackbar: {
           message: e.response.data,
@@ -87,6 +108,9 @@ export default class Login extends Component<{}, LoginState> {
     })
   }
 
+  /**
+   * Fecha o snackbar.
+   */
   handleClose(){
     this.setState({
       snackbar: {
@@ -96,6 +120,9 @@ export default class Login extends Component<{}, LoginState> {
     })
   }
 
+  /**
+   * Renderiza a página de login.
+   */
   render(){
     if(this.state.session.token)
       return <Redirect to="/dashboard" />
