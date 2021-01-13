@@ -6,7 +6,7 @@ import { Redirect } from 'react-router-dom'
 // Import dos components do Material UI
 import LoginForm from '../types/LoginForm'
 import Button from '@material-ui/core/Button'
-import { Card, CardContent, Container, Grid, Snackbar, TextField, Typography } from '@material-ui/core'
+import { Box, Card, CardContent, Container, Grid, Snackbar, TextField, Typography } from '@material-ui/core'
 // Import dos types
 import LoginResponse from '../types/LoginResponse'
 import LoginState from '../types/LoginState'
@@ -131,9 +131,12 @@ export default class Login extends Component<{}, LoginState> {
         <Container maxWidth="xs" className="my-login-page">
           <Card>
             <CardContent>
-              <Typography component="h1" variant="h4" align="center">
-                Controle de Estoque
-              </Typography>
+              <img src="pallet.png" className="my-logo"/>
+              <Box mt={2} mb={3}>
+                <Typography component="h1" variant="h4" align="center">
+                  Controle de Estoque
+                </Typography>
+              </Box>
               <form noValidate onSubmit={this.login.bind(this)}>
                 <Grid container>
                   <Grid item xs={12}>
@@ -161,8 +164,14 @@ export default class Login extends Component<{}, LoginState> {
                   </Button>
                 </Grid>
               </form>
+              
             </CardContent>
           </Card>
+          <Typography component="h3" variant="subtitle1" align="center">
+            Flaticon by <a href="https://www.flaticon.com/authors/phatplus" target="_blank">
+              phatplus
+            </a>
+          </Typography>
           <Snackbar open={this.state.snackbar.show} 
           autoHideDuration={6000} 
           onClose={this.handleClose.bind(this)}

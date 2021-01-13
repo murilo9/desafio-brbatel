@@ -365,6 +365,7 @@ export default class Dashboard extends Component<{}, DashboardState> {
    * Component funcional que renderiza a tabela de produtos.
    */
   renderProductsTable(){
+    // Caso esteja carregando os produtos
     if(this.state.fetching.loadingProducts){
       return <Box mt={2}>
         <Typography variant="subtitle1" gutterBottom>
@@ -372,6 +373,7 @@ export default class Dashboard extends Component<{}, DashboardState> {
         </Typography>
       </Box>
     }
+    // Caso não hajam produtos cadastrados
     else if(!this.state.products.length){
       return <Box mt={2}>
         <Paper className="my-padded-paper">
@@ -381,6 +383,7 @@ export default class Dashboard extends Component<{}, DashboardState> {
         </Paper>
       </Box>
     }
+    // Caso hajam produtos cadastrados
     else return (
       <Box mt={2}>
         <TableContainer component={Paper}>
@@ -470,7 +473,7 @@ export default class Dashboard extends Component<{}, DashboardState> {
                   </Button>
                 </Box>
                 <Box display={{xs: 'block', sm: 'none'}}>
-                  <IconButton>
+                  <IconButton onClick={this.logout.bind(this)}>
                     <LogoutIcon />
                   </IconButton>
                 </Box>

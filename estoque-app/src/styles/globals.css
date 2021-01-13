@@ -9,6 +9,11 @@ body {
   flex-direction: column;
   justify-content: center;
 }
+.my-logo {
+  display: block;
+  margin: auto;
+  width: 50%;
+}
 /* Ajuste para a topbar exibir os elementos nos cantos */
 .MuiToolbar-root {
   justify-content: space-between;
