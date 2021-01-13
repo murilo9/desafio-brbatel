@@ -27,10 +27,10 @@ export class App {
     PictureRoutes.routes(this.app, verifyJWT, upload);
     // Inicializa o banco de dados:
     const sequelize = new Sequelize({
-      database: 'brbatel',
+      database: process.env.DATABASE,
       dialect: 'postgres',
-      username: 'murilo',
-      password: '000000',
+      username: process.env.DBUSER,
+      password: process.env.DBPASSWORD,
       models: [`${__dirname}/models`], // or [Player, Team],
     });
     // Atualiza o banco de dados (cria as tabelas que não existirem)
